@@ -21,8 +21,9 @@ func (o *observer) OnCreate (fs *sd.FederatedService) {
 			}
 			s := api.AgentService{
 				Kind:    "",
-				ID:      fmt.Sprintf("%s-%s-s", fs.ServiceID, ep.Address, ep.Port),
-				Service: fmt.Sprintf("%s-%s", fs.Fqdn, proto,
+				ID:      fmt.Sprintf("%s-%s-s", fs.ServiceID, ep.Address, ep.Port), //probably needs to be UUID
+				Service: fmt.Sprintf("%s-%s", fs.Fqdn, proto), //replace dots with dashes
+					//SNI through service defaults
 				Tags:    fs.Tags,
 				Meta:    fs.Labels,
 				Port:    ep.Port,
@@ -30,11 +31,17 @@ func (o *observer) OnCreate (fs *sd.FederatedService) {
 				Weights: api.AgentWeights{},
 				Connect: &sc,
 			}
-			reg := api.CatalogRegistration{
-				Node:    "", //What to use here
-				Address: fs.Fqdn, //This doesn't seem right, but not sure where to store FQDN, or what should go here
-				Service: &s,
-				// Where do we use the SAN?
+			reg := api.CatalogRegistration{ // Look at what consul ESM does for all this
+				ID:              "",       //Make deterministic based on fs.ServiceID
+				Node:            "",       //Fake name/mesh ID
+				Address:         "",       //Test this to figure out what it does
+				TaggedAddresses: nil,
+				NodeMeta:        nil,
+				Datacenter:      "",
+				Service:         &s,
+				Check:           nil,
+				Checks:          nil,
+				SkipNodeUpdate:  false,
 			}
 			client.Catalog().Register(&reg, nil)
 		}

@@ -11,9 +11,9 @@ func OnNew(s api.CatalogService) {
 		Port:                 s.ServicePort,
 	}
 	fs := sd.FederatedService{
-		Fqdn:                 s.ServiceName,
-		ServiceID:            serviceID(s),
-		SAN:                  "",
+		Fqdn:                 s.ServiceName, //Make it the same as ServiceID
+		ServiceID:            serviceID(s), //Construct SNI, not just serviceID. static-client.default.dc2.internal.460a9779-1f39-4b0b-7543-b16ef756b30a.consul service_name/ns/dc/internal?/trust_domain. How to figure out, internal or external?
+		SAN:                  "", // agent/connect/ca/leaf/:service, /ns/default/svc/<service>
 		MeshIngress:          &mi,
 		Protocols:            nil, //Need to fill this in
 		Tags:                 s.ServiceTags,
